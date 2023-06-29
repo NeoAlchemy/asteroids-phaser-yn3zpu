@@ -100,6 +100,7 @@ class TitleLevel extends Phaser.Scene {
   preload() {
     this.load.baseURL = 'https://neoalchemy.github.io/asteroids-phaser-yn3zpu/';
     this.load.image('asteroid', 'static/assets/asteroid.png');
+    this.load.image('ship', 'static/assets/ship.png');
     this.load.bitmapFont({
       key: 'Orbitron',
       textureURL: 'static/assets/font/Orbitron.png',
@@ -114,6 +115,7 @@ class TitleLevel extends Phaser.Scene {
     let group = this.add.group();
     for (let i = 0; i < 5; i++) {
       let asteroid = this.add.sprite(10, 10, 'asteroid');
+      asteroid.scale = Phaser.Math.Between(1, 3);
       asteroid.angle = Phaser.Math.Between(0, 360);
       asteroid.x = Phaser.Math.Between(0, 400);
       asteroid.y = Phaser.Math.Between(0, 400);
@@ -158,9 +160,60 @@ class MainLevel extends Phaser.Scene {
 
   preload() {}
 
-  create() {}
+  create() {
+    let group = this.add.group();
+    for (let i = 0; i < 3; i++) {
+      let asteroid = this.add.sprite(10, 10, 'asteroid');
+      asteroid.scale = 4;
+      asteroid.angle = Phaser.Math.Between(0, 360);
+      asteroid.x = Phaser.Math.Between(0, 400);
+      asteroid.y = Phaser.Math.Between(0, 400);
+      group.add(asteroid);
+    }
+    this.asteroids = group;
 
-  update() {}
+    const ship = this.add.sprite(200, 200, 'ship');
+    this.ship = ship;
+
+    this.cursorKeys = this.input.keyboard.createCursorKeys();
+  }
+
+  private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+  private asteroids: Phaser.GameObjects.Group;
+  private ship: Phaser.GameObjects.Sprite;
+
+  update() {
+    if (this.asteroids.children) {
+      this.asteroids
+        .getChildren()
+        .forEach((asteroid: Phaser.GameObjects.Sprite) => {
+          this.moveForward(asteroid);
+        });
+    }
+
+    this.moveShip();
+  }
+
+  moveShip() {
+    if (this.cursorKeys.up.isDown) {
+      this.moveForward(this.ship);
+    } else if (this.cursorKeys.left.isDown) {
+      this.ship.angle -= 5;
+    } else if (this.cursorKeys.right.isDown) {
+      this.ship.angle += 5;
+    }
+  }
+
+  moveForward(gameObject: Phaser.GameObjects.Sprite) {
+    var angleRad = (gameObject.angle - 90) * (Math.PI / 180); //angle in radians
+    gameObject.x = gameObject.x + 1 * Math.cos(angleRad) * 1;
+    gameObject.y = gameObject.y + 1 * Math.sin(angleRad) * 1;
+    if (gameObject.x > 420) gameObject.x -= 420;
+    if (gameObject.y > 420) gameObject.y -= 420;
+
+    if (gameObject.x < 0) gameObject.x += 400;
+    if (gameObject.y < 0) gameObject.y += 400;
+  }
 }
 
 /* -------------------------------------------------------------------------- */
