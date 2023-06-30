@@ -101,6 +101,7 @@ class TitleLevel extends Phaser.Scene {
     this.load.baseURL = 'https://neoalchemy.github.io/asteroids-phaser-yn3zpu/';
     this.load.image('asteroid', 'static/assets/asteroid.png');
     this.load.image('ship', 'static/assets/ship.png');
+    this.load.image('bullet', 'static/assets/bullet.png');
     this.load.bitmapFont({
       key: 'Orbitron',
       textureURL: 'static/assets/font/Orbitron.png',
@@ -201,6 +202,15 @@ class MainLevel extends Phaser.Scene {
       this.ship.angle -= 5;
     } else if (this.cursorKeys.right.isDown) {
       this.ship.angle += 5;
+    } else if (this.cursorKeys.space.isDown) {
+      let bullet;
+      if (!bullet || !bullet.active) {
+        let bullet = this.add.sprite(this.ship.x, this.ship.y, 'bullet');
+        this.moveForward(bullet);
+        setTimeout(() => {
+          bullet.destroy();
+        }, 1000);
+      }
     }
   }
 
