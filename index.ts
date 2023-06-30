@@ -209,9 +209,9 @@ class MainLevel extends Phaser.Scene {
       const x = this.ship.x;
       const y = this.ship.y;
       const angle = this.ship.angle;
-      const bullet = this.add.sprite(x, y, 'bullet');
+      const bullet = this.physics.add.sprite(x, y, 'bullet');
+      bullet.angle = angle;
       this.bullet = bullet;
-      this.bullet.angle = angle;
     } else if (this.fire) {
       this.moveForward(this.bullet);
       setTimeout(() => {
