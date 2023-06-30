@@ -42,7 +42,7 @@ class SplashLevel extends Phaser.Scene {
 
     const text1 = this.add.bitmapText(-300, 200, 'Oswald', 'NeoAlchemy', 32);
     this.companyLine1 = text1;
-    const text2 = this.add.bitmapText(-300, 230, 'Oswald', 'Game Industry', 32);
+    const text2 = this.add.bitmapText(-300, 230, 'Oswald', 'Indie Games', 32);
     this.companyLine2 = text2;
 
     const loading = this.add.text(180, 300, ['Loading...'], {
@@ -77,7 +77,7 @@ class SplashLevel extends Phaser.Scene {
     });
     this.tweens.add({
       targets: this.companyLine2, //your image that must spin
-      x: '125',
+      x: '140',
       ease: 'Elastic',
       duration: 500, //duration is in milliseconds
     });
@@ -101,7 +101,7 @@ class TitleLevel extends Phaser.Scene {
     this.load.baseURL = 'https://neoalchemy.github.io/asteroids-phaser-yn3zpu/';
     this.load.image('asteroid', 'static/assets/asteroid.png');
     this.load.image('ship', 'static/assets/ship.png');
-    this.load.image('bullet', 'static/assets/bullet-v2.png');
+    this.load.image('bullet', 'static/assets/bullet-v3.png');
     this.load.bitmapFont({
       key: 'Orbitron',
       textureURL: 'static/assets/font/Orbitron.png',
@@ -164,7 +164,7 @@ class MainLevel extends Phaser.Scene {
   create() {
     let group = this.add.group();
     for (let i = 0; i < 3; i++) {
-      let asteroid = this.add.sprite(10, 10, 'asteroid');
+      let asteroid = this.physics.add.sprite(10, 10, 'asteroid');
       asteroid.scale = 2;
       asteroid.angle = Phaser.Math.Between(0, 360);
       asteroid.x = Phaser.Math.Between(0, 400);
@@ -173,8 +173,11 @@ class MainLevel extends Phaser.Scene {
     }
     this.asteroids = group;
 
-    const ship = this.add.sprite(200, 200, 'ship');
+    const ship = this.physics.add.sprite(200, 200, 'ship');
     this.ship = ship;
+
+    const bullet = this.physics.add.sprite(-10, -10, 'bullet');
+    this.bullet = bullet;
 
     this.cursorKeys = this.input.keyboard.createCursorKeys();
   }
@@ -200,31 +203,35 @@ class MainLevel extends Phaser.Scene {
   moveShip() {
     if (this.cursorKeys.up.isDown) {
       this.moveForward(this.ship);
-    } else if (this.cursorKeys.left.isDown) {
+    }
+    if (this.cursorKeys.left.isDown) {
       this.ship.angle -= 5;
-    } else if (this.cursorKeys.right.isDown) {
+    }
+    if (this.cursorKeys.right.isDown) {
       this.ship.angle += 5;
-    } else if (this.cursorKeys.space.isDown) {
+    }
+    if (this.cursorKeys.space.isDown) {
       this.fire = true;
-      const x = this.ship.x;
-      const y = this.ship.y;
-      const angle = this.ship.angle;
-      const bullet = this.physics.add.sprite(x, y, 'bullet');
-      bullet.angle = angle;
-      this.bullet = bullet;
-    } else if (this.fire) {
-      this.moveForward(this.bullet);
+      this.bullet.active = true;
+      this.bullet.visible = true;
+      this.bullet.x = this.ship.x;
+      this.bullet.y = this.ship.y;
+      this.bullet.angle = this.ship.angle;
+    }
+    if (this.fire) {
+      this.moveForward(this.bullet, 4);
       setTimeout(() => {
-        this.bullet.destroy();
         this.fire = false;
-      }, 2000);
+        this.bullet.active = false;
+        this.bullet.visible = false;
+      }, 1000);
     }
   }
 
-  moveForward(gameObject: Phaser.GameObjects.Sprite) {
+  moveForward(gameObject: Phaser.GameObjects.Sprite, speed: number = 1) {
     var angleRad = (gameObject.angle - 90) * (Math.PI / 180); //angle in radians
-    gameObject.x = gameObject.x + 1 * Math.cos(angleRad);
-    gameObject.y = gameObject.y + 1 * Math.sin(angleRad);
+    gameObject.x = gameObject.x + 1 * Math.cos(angleRad) * speed;
+    gameObject.y = gameObject.y + 1 * Math.sin(angleRad) * speed;
     if (gameObject.x > 420) gameObject.x -= 420;
     if (gameObject.y > 420) gameObject.y -= 420;
 
