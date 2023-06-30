@@ -182,6 +182,8 @@ class MainLevel extends Phaser.Scene {
   private cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
   private asteroids: Phaser.GameObjects.Group;
   private ship: Phaser.GameObjects.Sprite;
+  private bullet: Phaser.GameObjects.Sprite;
+  private fire: boolean = false;
 
   update() {
     if (this.asteroids.children) {
@@ -203,25 +205,26 @@ class MainLevel extends Phaser.Scene {
     } else if (this.cursorKeys.right.isDown) {
       this.ship.angle += 5;
     } else if (this.cursorKeys.space.isDown) {
-      let bullet;
-      if (!bullet || !bullet.active) {
-        const x = this.ship.x;
-        const y = this.ship.y;
-        const angle = this.ship.angle;
-        let bullet = this.add.sprite(x, y, 'bullet');
-        bullet.angle = angle;
-        this.moveForward(bullet);
-        setTimeout(() => {
-          bullet.destroy();
-        }, 1000);
-      }
+      this.fire = true;
+      const x = this.ship.x;
+      const y = this.ship.y;
+      const angle = this.ship.angle;
+      const bullet = this.add.sprite(x, y, 'bullet');
+      this.bullet = bullet;
+      this.bullet.angle = angle;
+    } else if (this.fire) {
+      this.moveForward(this.bullet);
+      setTimeout(() => {
+        this.bullet.destroy();
+        this.fire = false;
+      }, 2000);
     }
   }
 
   moveForward(gameObject: Phaser.GameObjects.Sprite) {
     var angleRad = (gameObject.angle - 90) * (Math.PI / 180); //angle in radians
-    gameObject.x = gameObject.x + 1 * Math.cos(angleRad) * 1;
-    gameObject.y = gameObject.y + 1 * Math.sin(angleRad) * 1;
+    gameObject.x = gameObject.x + 1 * Math.cos(angleRad);
+    gameObject.y = gameObject.y + 1 * Math.sin(angleRad);
     if (gameObject.x > 420) gameObject.x -= 420;
     if (gameObject.y > 420) gameObject.y -= 420;
 
