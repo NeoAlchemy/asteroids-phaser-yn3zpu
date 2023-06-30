@@ -164,7 +164,7 @@ class MainLevel extends Phaser.Scene {
     let group = this.add.group();
     for (let i = 0; i < 3; i++) {
       let asteroid = this.add.sprite(10, 10, 'asteroid');
-      asteroid.scale = 4;
+      asteroid.scale = 2;
       asteroid.angle = Phaser.Math.Between(0, 360);
       asteroid.x = Phaser.Math.Between(0, 400);
       asteroid.y = Phaser.Math.Between(0, 400);
